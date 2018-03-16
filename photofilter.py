@@ -40,5 +40,3 @@ if __name__ == '__main__':
     for img in imgs:
 
         filter(convert(img))
-    
-    

@@ -21,22 +21,30 @@ import shutil
 import datetime as dt
 
 from convert import convert
+from photofilter import filter
+from md import blog
+
 
 @app.route('/upload2', methods=['POST'])
 def upload2():
     imgurl = request.get_data()
 
     r = requests.get(imgurl, stream=True)
-    d = dt.datetime.now().isoformat()
-    d = d.replace(':', '')
-    path = 'img/{}.jpeg'.format(d)
+    dnow = dt.datetime.now()
+    dformattedshort = dnow.strftime('%Y-%m-%d')
+    dformatted = dnow.strftime('%Y-%m-%dT%H:%M:%SZ')
+    dsafe = dformatted.replace(':', '')
+    path = 'img/{}.jpeg'.format(dsafe)
 
     if r.status_code == 200:
         with open(path, 'wb') as f:
             r.raw.decode_content = True
             shutil.copyfileobj(r.raw, f)
 
-            convert(path)
+            newimg = filter(convert(path))
+            blog(newimg, dformatted, dformattedshort)
+
+
             
     return 'ok'
 
